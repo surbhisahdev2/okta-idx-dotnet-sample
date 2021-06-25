@@ -3,8 +3,9 @@
 <div>
     <p><h2>Welcome, @User.Identity.GetUserName()!</h2></p>
     <p>You have successfully signed in!</p>
+    <p>Ready to document your project details? </p>
 </div>
-<div class="row d-center">
+<!--<div class="row d-center">
     <div class="col-md-8">
         <dl class="dl-horizontal">
             @foreach (var claim in Model)
@@ -24,4 +25,16 @@
             }
         </dl>
     </div>
-</div>
+</div>-->
+<br></br>
+    <div class="col-md-10">
+        <div>
+
+            @Html.ActionLink("Add Project Details", "ProjectStartView", "Manage", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @id = "AddProjectBtn" }) <br></br>
+            @Html.ActionLink("Show Project Details", "Project", "Manage", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @id = "ShowProjectBtn" })<br></br>
+            @Html.ActionLink("Update Project Details", "Project", "Manage", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @id = "UpdateProjectBtn" })<br></br>
+
+        </div>
+    </div>
+
+

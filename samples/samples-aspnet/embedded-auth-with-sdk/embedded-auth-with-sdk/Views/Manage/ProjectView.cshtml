@@ -1,0 +1,41 @@
+﻿@model List<embedded_auth_with_sdk.Models.ProjectStartViewModel>
+@{
+    ViewBag.Title = "Project Details:";
+
+}
+<hr />
+
+<table class="table">
+    <tr>
+
+
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <p>@item.User</p>
+
+            </td>
+            <td>
+                <p>@item.ProjectName</p>
+            </td>
+            <td>
+                <p>@item.Implementation</p>
+            </td>
+            <td>
+
+                <p>@item.UseCase</p>
+            </td>
+
+        </tr>
+    }
+
+</table>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

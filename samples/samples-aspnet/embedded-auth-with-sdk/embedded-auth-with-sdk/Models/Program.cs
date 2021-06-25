@@ -10,67 +10,96 @@ using Google.Apis.Util.Store;
 using System.IO;
 using System.Threading;
 
-namespace Models
+namespace embedded_auth_with_sdk.Models
 {
     public class Program
     {
 
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
-        static string[] Scopes = { SheetsService.Scope.SpreadsheetsReadonly };
-        static string ApplicationName = "Google Sheets API .NET Quickstart";
-
-        private void googleSheets(string[] args)
+        static string[] Scopes = { SheetsService.Scope.Spreadsheets };
+        static string ApplicationName = "PS Google Sheet";
+        static readonly string SpreadsheetId = "1tgi-8YxVK4JMmj8C3mIpf0eimwUd2mKi06AWYeqnV-8";
+        static readonly string sheet = "Sheet1";
+        static SheetsService service;
+      
+        public void googleSheets()
         {
-            UserCredential credential;
+            GoogleCredential credential;
 
-            using (var stream =
-                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+            string path1 = HttpContext.Current.Server.MapPath("..");
+
+            string path2 = "\\Scripts\\credentials.json";
+            using (var stream = new FileStream(path1+path2, FileMode.Open, FileAccess.Read))
             {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-                Console.WriteLine("Credential file saved to: " + credPath);
+                credential = GoogleCredential.FromStream(stream).CreateScoped(Scopes);
             }
-
-            // Create Google Sheets API service.
-            var service = new SheetsService(new BaseClientService.Initializer()
+            service = new SheetsService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
+            //  ReadEntries();
+            //CreateEntry();
+            //UpdateEntry();
 
-            // Define request parameters.
-            String spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms";
-            String range = "Class Data!A2:E";
+        }
+        public List<ProjectStartViewModel> ReadEntries()
+        {
+            var range = $"{sheet}!A:F";
             SpreadsheetsResource.ValuesResource.GetRequest request =
-                    service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    service.Spreadsheets.Values.Get(SpreadsheetId, range);
+            var response = request.Execute();
+            IList<IList<object>> values = response.Values;
+            List<ProjectStartViewModel> listView = new List<ProjectStartViewModel>();
 
-            // Prints the names and majors of students in a sample spreadsheet:
-            // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-            ValueRange response = request.Execute();
-            IList<IList<Object>> values = response.Values;
             if (values != null && values.Count > 0)
             {
-                Console.WriteLine("Name, Major");
                 foreach (var row in values)
                 {
-                    // Print columns A and E, which correspond to indices 0 and 4.
-                    Console.WriteLine("{0}, {1}", row[0], row[4]);
+                    // Print columns A to F, which correspond to indices 0 and 4.
+                    ProjectStartViewModel p = new ProjectStartViewModel();
+                    p.User = row[0].ToString();
+                    p.ProjectName = row[1].ToString();
+                    p.Implementation = row[2].ToString();
+                    p.UseCase = row[3].ToString();
+
+                    listView.Add(p);
+                 //   Console.WriteLine("{0} | {1} | {2} | {3} | {4} | {5}", row[0], row[1], row[2], row[3], row[4], row[5]);
                 }
             }
             else
             {
                 Console.WriteLine("No data found.");
             }
-            Console.Read();
-
+            return listView;
         }
-}
+        public void CreateEntry(string ProjectName, string Implementation, string UseCase, string User)
+        {
+            googleSheets();
+            
+            var range = $"{sheet}!A:F";
+            var valueRange = new ValueRange();
+            
+            var oblist = new List<object>() { ProjectName, Implementation, UseCase, User};
+            valueRange.Values = new List<IList<object>> { oblist };
+
+            var appendRequest = service.Spreadsheets.Values.Append(valueRange, SpreadsheetId, range);
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+            var appendReponse = appendRequest.Execute();
+        }
+
+        static void UpdateEntry()
+        {
+            var range = $"{sheet}!D2";
+            var valueRange = new ValueRange();
+
+            var oblist = new List<object>() { "updated" };
+            valueRange.Values = new List<IList<object>> { oblist };
+
+            var updateRequest = service.Spreadsheets.Values.Update(valueRange, SpreadsheetId, range);
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var appendReponse = updateRequest.Execute();
+        }
+    }
     }

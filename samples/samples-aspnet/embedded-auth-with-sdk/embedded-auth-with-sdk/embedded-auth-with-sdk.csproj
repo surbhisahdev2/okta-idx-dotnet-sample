@@ -388,6 +388,7 @@
     <Content Include="Views\Shared\Idps.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
     <Content Include="Views\Manage\ProjectStartView.cshtml" />
+    <Content Include="Views\Manage\ProjectView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

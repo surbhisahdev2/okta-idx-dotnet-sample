@@ -447,13 +447,56 @@
                 return View("ProjectStartView");
             }
 
+            var p = new Program();
+            string pName = HttpContext.Request.Form["ProjectName"].ToString();
+            string implementation = HttpContext.Request.Form["Implementation"].ToString();
+            string useCase = HttpContext.Request.Form["UseCase"].ToString();
+            string user = HttpContext.Request.Form["User"].ToString();
+            
+            //add project name, implementation, use case and user id to the google sheet
+            p.CreateEntry(pName, implementation, useCase, user);
+
+            
             var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
             await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
-            _authenticationManager.SignOut();
-            return RedirectToAction("Index", "Home");
+            //       _authenticationManager.SignOut();
+            //redirect to the next page to display 
+            List<ProjectStartViewModel> listView = p.ReadEntries();
+        //    listView.Add(model);
 
-
+            return View("ProjectView", listView);
         }
 
+        [AllowAnonymous]
+        public ActionResult ProjectView()
+        {
+            return View();
+        }
+  /*      [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ProjectAsync(ProjectStartViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ProjectView");
+            }
+
+            var p = new Program();
+            string pName = HttpContext.Request.Form["ProjectName"].ToString();
+            string implementation = HttpContext.Request.Form["Implementation"].ToString();
+            string useCase = HttpContext.Request.Form["UseCase"].ToString();
+            string user = HttpContext.Request.Form["User"].ToString();
+
+            //add project name, implementation, use case and user id to the google sheet
+            p.CreateEntry(pName, implementation, useCase, user);
+
+
+            var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
+            await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
+            //       _authenticationManager.SignOut();
+            //redirect to the next page to display 
+            return RedirectToAction("ProjectView", p);
+        }*/
     }
 }

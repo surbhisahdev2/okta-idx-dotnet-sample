@@ -19,6 +19,11 @@ namespace embedded_auth_with_sdk.Models
         public string UseCase { get; set; }
 
         [Display(Name = "Implementation")]
-        public string Implementation { get; set; } 
+        public string Implementation { get; set; }
+
+        [Display(Name = "User")]
+        public string User { get; set; }
+
+
     }
 }
